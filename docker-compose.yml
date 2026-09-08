@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: agentic-postgres
+
+    environment:
+      POSTGRES_DB: agentic_ai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - agentic_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentic_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  agentic_postgres_data:

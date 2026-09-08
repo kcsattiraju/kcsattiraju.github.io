@@ -1,0 +1,35 @@
+{
+  "servers": [
+    {
+      "name": "local",
+      "transport": "local",
+      "url": null,
+      "enabled_tools": [
+        "calculator",
+        "current_datetime"
+      ]
+    },
+    {
+      "name": "aws-sitewise",
+      "transport": "streamable-http",
+      "url": "http://localhost:8001/mcp",
+      "enabled_tools": [
+        "list_assets",
+        "describe_asset",
+        "list_asset_models",
+        "describe_asset_model",
+        "list_asset_properties",
+        "get_live_property_value",
+        "get_all_live_values"
+      ]
+    },
+    {
+      "name": "rag-server",
+      "transport": "streamable-http",
+      "url": "http://localhost:8002/mcp",
+      "enabled_tools": [
+        "retrieve_documents"
+      ]
+    }
+  ]
+}

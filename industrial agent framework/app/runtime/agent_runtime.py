@@ -1,72 +1,115 @@
-from langchain.agents import create_agent
+from langgraph.prebuilt import create_react_agent
 
 from app.models.llm_factory import create_llm
-from app.tools.tool_registry import get_tools
+
+from app.tools.tool_registry import (
+    get_tools,
+)
 
 
 def build_runtime_agent(
-    agent_definition,
+    agent,
     tool_names: list[str],
 ):
     """
-    Build a synchronous LangChain runtime agent.
-
-    Current demo behavior:
-    - Agent config comes from PostgreSQL.
-    - Assigned tool names come from PostgreSQL.
-    - Executable local tools come from tool_registry.py.
-    - MCP server definitions remain in tool_registry.json
-      but are not executed yet.
+    Build an executable LangGraph agent
+    using the configuration stored in PostgreSQL.
     """
 
-    llm = create_llm(
-        model_name=agent_definition.model_name
-    )
+    # -----------------------------------------
+    # 1. Resolve actual Python tools
+    # -----------------------------------------
 
     tools = get_tools(
         tool_names
     )
 
-    system_prompt = f"""
-You are an AI agent running inside
-an Agentic AI Platform.
+    print()
+    print(
+        "Runtime agent tools:",
+        [
+            tool.name
+            for tool in tools
+        ]
+    )
 
-Agent Name:
-{agent_definition.name}
+    # -----------------------------------------
+    # 2. Determine model
+    # -----------------------------------------
 
-Purpose:
-{agent_definition.purpose}
+    model_name = getattr(
+        agent,
+        "model_name",
+        None
+    )
+
+    llm = create_llm(
+        model_name
+    )
+
+    # -----------------------------------------
+    # 3. Build system prompt
+    # -----------------------------------------
+
+    agent_name = getattr(
+        agent,
+        "name",
+        "Industrial AI Agent"
+    )
+
+    description = getattr(
+        agent,
+        "description",
+        ""
+    ) or ""
+
+    goal = getattr(
+        agent,
+        "goal",
+        ""
+    ) or ""
+
+    system_prompt = getattr(
+        agent,
+        "system_prompt",
+        ""
+    ) or ""
+
+    prompt = f"""
+You are {agent_name}.
+
+Description:
+{description}
 
 Goal:
-{agent_definition.goal}
+{goal}
 
 Instructions:
-{agent_definition.system_prompt}
+{system_prompt}
 
-Rules:
+You have access to the tools assigned to you.
 
-1. Understand the user's request.
+When a user's question requires information from
+industrial manuals, technical documentation,
+maintenance documentation, troubleshooting guides,
+or equipment procedures, use the appropriate
+document retrieval tool before answering.
 
-2. Work toward the configured goal.
+Do not invent information that should come from
+industrial documentation.
 
-3. Use an assigned tool when appropriate.
-
-4. Only use the tools provided to you.
-
-5. Never claim that you used a tool
-   unless you actually executed it.
-
-6. If you do not have the capability
-   required by the user, explain that
-   clearly.
-
-7. Respond naturally and clearly.
+If retrieved documentation contains source or page
+information, include it in your answer when useful.
 """
 
-    runtime_agent = create_agent(
+    # -----------------------------------------
+    # 4. Create LangGraph ReAct agent
+    # -----------------------------------------
+
+    runtime_agent = create_react_agent(
         model=llm,
         tools=tools,
-        system_prompt=system_prompt,
+        prompt=prompt,
     )
 
     return runtime_agent

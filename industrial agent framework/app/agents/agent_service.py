@@ -1,254 +1,388 @@
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.agents.agent_model import Agent
 from app.agents.agent_repository import AgentRepository
-from app.api.schemas.agent_schema import (
-    AgentCreate,
-    AgentUpdate,
-)
 from app.tools.tool_repository import ToolRepository
 
 
 class AgentService:
 
-    # ---------------------------------------------------
-    # Build API response using database relationship
-    # ---------------------------------------------------
+    # ========================================================
+    # CONVERT AGENT ID
+    # ========================================================
+
+    @staticmethod
+    def _to_uuid(agent_id) -> UUID:
+        """
+        Convert string agent IDs coming from FastAPI/Streamlit
+        into UUID objects used by PostgreSQL/SQLAlchemy.
+        """
+
+        if isinstance(agent_id, UUID):
+            return agent_id
+
+        return UUID(str(agent_id))
+
+
+    # ========================================================
+    # EXTRACT TOOL NAME
+    # ========================================================
+
+    @staticmethod
+    def _get_tool_name(tool):
+        """
+        Supports tools returned as:
+
+        Dictionary:
+            {"name": "search_documents"}
+
+        String:
+            "search_documents"
+
+        ORM object:
+            tool.name
+        """
+
+        if isinstance(tool, dict):
+
+            return (
+                tool.get("name")
+                or tool.get("tool_name")
+            )
+
+        if isinstance(tool, str):
+
+            return tool
+
+        return getattr(
+            tool,
+            "name",
+            None
+        )
+
+
+    # ========================================================
+    # BUILD AGENT RESPONSE
+    # ========================================================
 
     @staticmethod
     def _build_agent_response(
         db: Session,
         agent: Agent,
-    ) -> dict:
+    ):
 
-        tool_repository = ToolRepository(db)
+        tool_repository = ToolRepository(
+            db
+        )
 
-        assigned_tools = tool_repository.get_agent_tools(
+        tools = tool_repository.get_agent_tools(
             agent.id
         )
 
+        tool_names = []
+
+        for tool in tools:
+
+            tool_name = (
+                AgentService._get_tool_name(
+                    tool
+                )
+            )
+
+            if tool_name:
+
+                tool_names.append(
+                    tool_name
+                )
+
+
         return {
-            "id": agent.id,
+            "id": str(agent.id),
             "name": agent.name,
             "description": agent.description,
-            "purpose": agent.purpose,
             "goal": agent.goal,
             "system_prompt": agent.system_prompt,
-            "model_provider": agent.model_provider,
-            "model_name": agent.model_name,
-            "memory_enabled": agent.memory_enabled,
-            "is_active": agent.is_active,
-            "version": agent.version,
-            "created_at": agent.created_at,
-            "updated_at": agent.updated_at,
-
-            # IMPORTANT:
-            # Loaded from agent_tools -> tools
-            "tools": [
-                tool.name
-                for tool in assigned_tools
-            ],
+            "tools": tool_names,
         }
 
-    # ---------------------------------------------------
-    # Create Agent
-    # ---------------------------------------------------
+
+    # ========================================================
+    # CREATE AGENT
+    # ========================================================
 
     @staticmethod
     def create_agent(
         db: Session,
-        request: AgentCreate,
-    ) -> dict:
+        agent_data,
+    ):
+
+        # ----------------------------------------------------
+        # CREATE ORM AGENT OBJECT
+        # ----------------------------------------------------
 
         agent = Agent(
-            name=request.name,
-            description=request.description,
-            purpose=request.purpose,
-            goal=request.goal,
-            system_prompt=request.system_prompt,
-            model_provider=request.model_provider,
-            model_name=request.model_name,
-            memory_enabled=request.memory_enabled,
+            name=agent_data.name,
+            description=agent_data.description,
+            goal=agent_data.goal,
+            system_prompt=agent_data.system_prompt,
         )
 
-        agent = AgentRepository.create(
-            db,
-            agent,
-        )
 
-        tool_repository = ToolRepository(db)
+        # ----------------------------------------------------
+        # SAVE AGENT
+        # ----------------------------------------------------
 
-        try:
-
-            # Save selected tools in agent_tools
-            tool_repository.replace_agent_tools(
-                agent.id,
-                request.tools,
-            )
-
-        except ValueError as error:
-
-            # Remove the newly created agent
-            # if tool assignment failed
-            AgentRepository.delete(
+        created_agent = (
+            AgentRepository.create(
                 db,
                 agent,
             )
+        )
 
-            raise HTTPException(
-                status_code=400,
-                detail=str(error),
+
+        # ----------------------------------------------------
+        # ASSIGN TOOLS
+        # ----------------------------------------------------
+
+        tools = (
+            agent_data.tools
+            if agent_data.tools
+            else []
+        )
+
+
+        tool_repository = ToolRepository(
+            db
+        )
+
+
+        tool_repository.replace_agent_tools(
+            created_agent.id,
+            tools,
+        )
+
+
+        # ----------------------------------------------------
+        # RETURN RESPONSE
+        # ----------------------------------------------------
+
+        return (
+            AgentService._build_agent_response(
+                db,
+                created_agent,
             )
-
-        return AgentService._build_agent_response(
-            db,
-            agent,
         )
 
-    # ---------------------------------------------------
-    # Get one Agent
-    # ---------------------------------------------------
 
-    @staticmethod
-    def get_agent(
-        db: Session,
-        agent_id: UUID,
-    ) -> dict:
-
-        agent = AgentRepository.get_by_id(
-            db,
-            agent_id,
-        )
-
-        if agent is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Agent not found.",
-            )
-
-        return AgentService._build_agent_response(
-            db,
-            agent,
-        )
-
-    # ---------------------------------------------------
-    # Get all Agents
-    # ---------------------------------------------------
+    # ========================================================
+    # GET ALL AGENTS
+    # ========================================================
 
     @staticmethod
     def get_agents(
         db: Session,
-    ) -> list[dict]:
+    ):
 
-        agents = AgentRepository.get_all(db)
+        agents = (
+            AgentRepository.get_all(
+                db
+            )
+        )
 
-        return [
+
+        results = []
+
+
+        for agent in agents:
+
+            results.append(
+                AgentService._build_agent_response(
+                    db,
+                    agent,
+                )
+            )
+
+
+        return results
+
+
+    # ========================================================
+    # GET AGENT BY ID
+    # ========================================================
+
+    @staticmethod
+    def get_agent(
+        db: Session,
+        agent_id,
+    ):
+
+        agent_uuid = (
+            AgentService._to_uuid(
+                agent_id
+            )
+        )
+
+
+        agent = (
+            AgentRepository.get_by_id(
+                db,
+                agent_uuid,
+            )
+        )
+
+
+        if agent is None:
+
+            return None
+
+
+        return (
             AgentService._build_agent_response(
                 db,
                 agent,
             )
-            for agent in agents
-        ]
+        )
 
-    # ---------------------------------------------------
-    # Update Agent
-    # ---------------------------------------------------
+
+    # ========================================================
+    # UPDATE AGENT
+    # ========================================================
 
     @staticmethod
     def update_agent(
         db: Session,
-        agent_id: UUID,
-        request: AgentUpdate,
-    ) -> dict:
+        agent_id,
+        agent_data,
+    ):
 
-        agent = AgentRepository.get_by_id(
-            db,
-            agent_id,
+        agent_uuid = (
+            AgentService._to_uuid(
+                agent_id
+            )
         )
+
+
+        # ----------------------------------------------------
+        # FIND AGENT
+        # ----------------------------------------------------
+
+        agent = (
+            AgentRepository.get_by_id(
+                db,
+                agent_uuid,
+            )
+        )
+
 
         if agent is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Agent not found.",
-            )
 
-        update_data = request.model_dump(
-            exclude_unset=True
+            return None
+
+
+        # ----------------------------------------------------
+        # UPDATE FIELDS
+        # ----------------------------------------------------
+
+        agent.name = (
+            agent_data.name
         )
 
-        # tools is relationship data,
-        # not a column on agents
-        tools = update_data.pop(
-            "tools",
-            None,
+        agent.description = (
+            agent_data.description
         )
 
-        for field, value in update_data.items():
-            setattr(
+        agent.goal = (
+            agent_data.goal
+        )
+
+        agent.system_prompt = (
+            agent_data.system_prompt
+        )
+
+
+        # ----------------------------------------------------
+        # SAVE CHANGES
+        # ----------------------------------------------------
+
+        updated_agent = (
+            AgentRepository.save(
+                db,
                 agent,
-                field,
-                value,
             )
-
-        agent = AgentRepository.save(
-            db,
-            agent,
         )
 
-        if tools is not None:
 
-            tool_repository = ToolRepository(db)
+        # ----------------------------------------------------
+        # UPDATE TOOLS
+        # ----------------------------------------------------
 
-            try:
-                tool_repository.replace_agent_tools(
-                    agent.id,
-                    tools,
-                )
-
-            except ValueError as error:
-                raise HTTPException(
-                    status_code=400,
-                    detail=str(error),
-                )
-
-        return AgentService._build_agent_response(
-            db,
-            agent,
+        tools = (
+            agent_data.tools
+            if agent_data.tools
+            is not None
+            else []
         )
 
-    # ---------------------------------------------------
-    # Delete Agent
-    # ---------------------------------------------------
+
+        tool_repository = ToolRepository(
+            db
+        )
+
+
+        tool_repository.replace_agent_tools(
+            updated_agent.id,
+            tools,
+        )
+
+
+        # ----------------------------------------------------
+        # RETURN UPDATED AGENT
+        # ----------------------------------------------------
+
+        return (
+            AgentService._build_agent_response(
+                db,
+                updated_agent,
+            )
+        )
+
+
+    # ========================================================
+    # DELETE AGENT
+    # ========================================================
 
     @staticmethod
     def delete_agent(
         db: Session,
-        agent_id: UUID,
-    ) -> None:
+        agent_id,
+    ):
 
-        agent = AgentRepository.get_by_id(
-            db,
-            agent_id,
+        agent_uuid = (
+            AgentService._to_uuid(
+                agent_id
+            )
         )
+
+
+        agent = (
+            AgentRepository.get_by_id(
+                db,
+                agent_uuid,
+            )
+        )
+
 
         if agent is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Agent not found.",
-            )
 
-        tool_repository = ToolRepository(db)
+            return False
 
-        # Explicitly remove agent-tool relationships
-        tool_repository.replace_agent_tools(
-            agent.id,
-            [],
-        )
 
         AgentRepository.delete(
             db,
             agent,
         )
+
+
+        return True

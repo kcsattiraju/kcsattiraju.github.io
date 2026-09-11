@@ -10,5 +10,7 @@ pydantic-settings
 python-dotenv
 python-multipart
 streamlit
-requestsstreamlit
 requests
+pgvector
+sentence-transformers
+sentence-transformers

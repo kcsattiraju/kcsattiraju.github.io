@@ -28,8 +28,16 @@
       "transport": "streamable-http",
       "url": "http://localhost:8002/mcp",
       "enabled_tools": [
-        "retrieve_documents"
+        "search_documents","semantic_document_search"
       ]
-    }
+    },
+    {
+  "name": "semantic_document_search",
+  "description": "Search industrial manuals and technical documentation using semantic similarity."
+},
+{
+    "name": "search_documents",
+    "description": "Search industrial manuals using semantic retrieval"
+}
   ]
 }

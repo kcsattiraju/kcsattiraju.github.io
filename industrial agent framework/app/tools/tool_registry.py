@@ -6,6 +6,12 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 
+from app.tools.semantic_search_tool import (
+    semantic_document_search,
+)
+
+from app.tools.document_retrieval_tool import search_documents
+
 
 # ---------------------------------------------------
 # Registry configuration file
@@ -175,6 +181,8 @@ def _evaluate_node(node):
 LOCAL_TOOL_REGISTRY = {
     "calculator": calculator,
     "current_datetime": current_datetime,
+    "semantic_document_search": semantic_document_search,
+     "search_documents": search_documents,
 }
 
 

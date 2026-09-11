@@ -1,93 +1,79 @@
 from uuid import UUID
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    status,
-)
-
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.database.connection import get_db
 from app.tools.tool_service import ToolService
 
 
 router = APIRouter(
+    prefix="/tools",
     tags=["Tools"],
 )
 
 
-# ---------------------------------------------------
-# Get all available tools
-# ---------------------------------------------------
+@router.get("")
+def get_tools(db=Depends(get_db)):
+    """Return all enabled tools."""
+    try:
+        service = ToolService(db)
+        return service.get_all_tools()
 
-@router.get("/tools")
-def get_tools(
-    db: Session = Depends(get_db),
-):
-
-    service = ToolService(db)
-
-    return service.get_all_tools()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
 
 
-# ---------------------------------------------------
-# Get tools assigned to an Agent
-# ---------------------------------------------------
-
-@router.get(
-    "/agents/{agent_id}/tools"
-)
+@router.get("/agent/{agent_id}")
 def get_agent_tools(
     agent_id: UUID,
-    db: Session = Depends(get_db),
+    db=Depends(get_db),
 ):
+    """Return tools assigned to a particular agent."""
+    try:
+        service = ToolService(db)
+        return service.get_agent_tools(agent_id)
 
-    service = ToolService(db)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
 
-    return service.get_agent_tools(
-        agent_id
-    )
 
-
-# ---------------------------------------------------
-# Assign Tool to Agent
-# ---------------------------------------------------
-
-@router.post(
-    "/agents/{agent_id}/tools/{tool_id}",
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/agent/{agent_id}/{tool_name}")
 def assign_tool(
     agent_id: UUID,
-    tool_id: UUID,
-    db: Session = Depends(get_db),
+    tool_name: str,
+    db=Depends(get_db),
 ):
+    """Assign an existing tool to an agent."""
+    try:
+        service = ToolService(db)
 
-    service = ToolService(db)
+        result = service.assign_tool(
+            agent_id=agent_id,
+            tool_name=tool_name,
+        )
 
-    return service.assign_tool(
-        agent_id,
-        tool_id,
-    )
+        return {
+            "message": (
+                f"Tool '{tool_name}' assigned "
+                f"to agent '{agent_id}'."
+            ),
+            "result": result,
+        }
 
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
 
-# ---------------------------------------------------
-# Remove Tool from Agent
-# ---------------------------------------------------
-
-@router.delete(
-    "/agents/{agent_id}/tools/{tool_id}"
-)
-def remove_tool(
-    agent_id: UUID,
-    tool_id: UUID,
-    db: Session = Depends(get_db),
-):
-
-    service = ToolService(db)
-
-    return service.remove_tool(
-        agent_id,
-        tool_id,
-    )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc

@@ -1,98 +1,221 @@
-from uuid import UUID
-
-from fastapi import (
-    APIRouter,
-    Depends,
-    Response,
-    status,
-)
-
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
-from app.api.schemas.agent_schema import (
-    AgentCreate,
-    AgentResponse,
-    AgentUpdate,
-)
-
-from app.agents.agent_service import AgentService
 from app.database.connection import get_db
+from app.agents.agent_service import AgentService
 
 
 router = APIRouter(
     prefix="/agents",
-    tags=["Agents"],
+    tags=["Agents"]
 )
 
 
-@router.post(
-    "",
-    response_model=AgentResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+# ============================================================
+# REQUEST MODELS
+# ============================================================
+
+class AgentCreateRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+    goal: str
+    system_prompt: str
+
+    tools: List[str] = Field(
+        default_factory=list
+    )
+
+
+class AgentUpdateRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+    goal: str
+    system_prompt: str
+
+    tools: List[str] = Field(
+        default_factory=list
+    )
+
+
+# ============================================================
+# CREATE AGENT
+# ============================================================
+
+@router.post("")
 def create_agent(
-    request: AgentCreate,
-    db: Session = Depends(get_db),
+    request: AgentCreateRequest,
+    db: Session = Depends(get_db)
 ):
-    return AgentService.create_agent(
-        db,
-        request,
-    )
+    try:
+
+        return AgentService.create_agent(
+            db,
+            request
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            "CREATE AGENT ERROR:",
+            repr(e)
+        )
+
+        raise
 
 
-@router.get(
-    "",
-    response_model=list[AgentResponse],
-)
+# ============================================================
+# GET ALL AGENTS
+# ============================================================
+
+@router.get("")
 def get_agents(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
-    return AgentService.get_agents(db)
+    try:
+
+        return AgentService.get_agents(
+            db
+        )
+
+    except Exception as e:
+
+        print(
+            "GET AGENTS ERROR:",
+            repr(e)
+        )
+
+        raise
 
 
-@router.get(
-    "/{agent_id}",
-    response_model=AgentResponse,
-)
+# ============================================================
+# GET AGENT BY ID
+# ============================================================
+
+@router.get("/{agent_id}")
 def get_agent(
-    agent_id: UUID,
-    db: Session = Depends(get_db),
+    agent_id: str,
+    db: Session = Depends(get_db)
 ):
-    return AgentService.get_agent(
-        db,
-        agent_id,
-    )
+    try:
+
+        agent = AgentService.get_agent(
+            db,
+            agent_id
+        )
+
+        if agent is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Agent not found"
+            )
+
+        return agent
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        print(
+            "GET AGENT ERROR:",
+            repr(e)
+        )
+
+        raise
 
 
-@router.patch(
-    "/{agent_id}",
-    response_model=AgentResponse,
-)
+# ============================================================
+# UPDATE AGENT
+# ============================================================
+
+@router.put("/{agent_id}")
 def update_agent(
-    agent_id: UUID,
-    request: AgentUpdate,
-    db: Session = Depends(get_db),
+    agent_id: str,
+    request: AgentUpdateRequest,
+    db: Session = Depends(get_db)
 ):
-    return AgentService.update_agent(
-        db,
-        agent_id,
-        request,
-    )
+    try:
+
+        agent = AgentService.update_agent(
+            db,
+            agent_id,
+            request
+        )
+
+        if agent is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Agent not found"
+            )
+
+        return agent
+
+    except HTTPException:
+        raise
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            "UPDATE AGENT ERROR:",
+            repr(e)
+        )
+
+        raise
 
 
-@router.delete(
-    "/{agent_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
+# ============================================================
+# DELETE AGENT
+# ============================================================
+
+@router.delete("/{agent_id}")
 def delete_agent(
-    agent_id: UUID,
-    db: Session = Depends(get_db),
+    agent_id: str,
+    db: Session = Depends(get_db)
 ):
-    AgentService.delete_agent(
-        db,
-        agent_id,
-    )
+    try:
 
-    return Response(
-        status_code=status.HTTP_204_NO_CONTENT
-    )
+        deleted = AgentService.delete_agent(
+            db,
+            agent_id
+        )
+
+        if not deleted:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Agent not found"
+            )
+
+        return {
+            "message": "Agent deleted successfully"
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        print(
+            "DELETE AGENT ERROR:",
+            repr(e)
+        )
+
+        raise

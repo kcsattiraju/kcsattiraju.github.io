@@ -8,7 +8,7 @@
 
   <meta
     name="description"
-    content="Portfolio of Kranti Sattiraju - Senior Software Engineer and AI Engineer specializing in C#, .NET, Python, Agentic AI, RAG, LangGraph, LangChain, APIs, cloud platforms, and enterprise software."
+    content="Portfolio of Kranti Sattiraju, Senior Software Engineer and AI Engineer specializing in C#, .NET, Python, Agentic AI, RAG, LangGraph, LangChain, APIs, cloud platforms, and enterprise software."
   />
 
   <link rel="stylesheet" href="styles.css" />
@@ -16,8 +16,12 @@
 
 <body>
 
-  <!-- HERO -->
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
   <header class="hero">
+
     <div class="hero__content">
 
       <p class="eyebrow">
@@ -35,31 +39,48 @@
       </p>
 
       <div class="hero__actions">
-        <a class="button button--primary" href="#projects">
+
+        <a
+          class="button button--primary"
+          href="#projects"
+        >
           View Projects
         </a>
 
-        <a class="button button--secondary" href="#about">
+        <a
+          class="button button--secondary"
+          href="#about"
+        >
           About Me
         </a>
+
       </div>
 
     </div>
 
+
     <div class="hero__image-wrap">
+
       <img
         src="assets/profile.jpg"
         alt="Kranti Sattiraju"
         class="hero__image"
       />
+
     </div>
+
   </header>
 
 
   <main>
 
-    <!-- ABOUT -->
+    <!-- =====================================================
+         ABOUT
+    ====================================================== -->
+
     <section class="section" id="about">
+
+      <p class="eyebrow">About</p>
 
       <h2>About Me</h2>
 
@@ -86,8 +107,13 @@
     </section>
 
 
-    <!-- TECHNICAL EXPERTISE -->
+    <!-- =====================================================
+         TECHNICAL EXPERTISE
+    ====================================================== -->
+
     <section class="section" id="skills">
+
+      <p class="eyebrow">Skills</p>
 
       <h2>Technical Expertise</h2>
 
@@ -96,14 +122,15 @@
         <p>
           <strong>Software Engineering:</strong>
           C#, .NET 8/.NET Core, ASP.NET Core, Entity Framework Core,
-          Python, REST APIs, Microservices, OOP, Design Patterns,
-          Distributed Systems
+          Python, REST APIs, Microservices, Object-Oriented Programming,
+          Design Patterns, Distributed Systems
         </p>
 
         <p>
           <strong>AI & Agentic AI:</strong>
-          LangGraph, LangChain, LLMs, AI Agents, Tool Calling,
-          Multi-Agent Workflows, RAG, Embeddings,
+          LangGraph, LangChain, Large Language Models (LLMs),
+          AI Agents, Tool Calling, Multi-Agent Workflows,
+          Retrieval-Augmented Generation (RAG), Embeddings,
           Semantic Search, Prompt Engineering
         </p>
 
@@ -124,51 +151,132 @@
     </section>
 
 
-    <!-- FEATURED PROJECTS -->
+    <!-- =====================================================
+         FEATURED PROJECTS
+    ====================================================== -->
+
     <section class="section" id="projects">
 
       <div class="section-heading">
-        <p class="eyebrow">Selected Work</p>
-        <h2>Featured Projects</h2>
+
+        <p class="eyebrow">
+          Selected Work
+        </p>
+
+        <h2>
+          Featured Projects
+        </h2>
 
         <p>
-          AI systems I've designed and built using agents,
-          retrieval, APIs, databases, and modern software architecture.
+          AI systems built using intelligent agents, retrieval,
+          APIs, databases, LLMs, and modern software architecture.
         </p>
+
       </div>
 
 
       <div class="projects-grid">
 
-        <!-- PROJECT 1 -->
+
+        <!-- =================================================
+             PROJECT 1
+             INDUSTRIAL AI AGENT ARCHITECTURE
+        ================================================== -->
+
         <article class="card project-card">
 
           <div class="project-card__header">
-            <span class="project-number">01</span>
-            <span class="project-type">Agentic AI</span>
+
+            <span class="project-number">
+              01
+            </span>
+
+            <span class="project-type">
+              Agentic AI
+            </span>
+
           </div>
 
-          <h3>Industrial AI Agent Architecture</h3>
+
+          <h3>
+            Industrial AI Agent Architecture
+          </h3>
+
 
           <p class="project-description">
-            An extensible Agentic AI platform for creating,
-            configuring, managing, and orchestrating specialized
-            AI agents for enterprise and industrial applications.
+
+            An extensible Agentic AI platform designed to create,
+            configure, manage, and orchestrate specialized AI agents
+            for enterprise and industrial applications.
+
           </p>
 
+
+          <p>
+
+            The architecture enables agents to retrieve enterprise
+            knowledge, invoke tools and APIs, maintain conversation
+            context, and participate in intelligent workflows.
+
+          </p>
+
+
           <ul class="project-features">
-            <li>Agent orchestration with LangGraph and LangChain</li>
-            <li>Dynamic agent-to-tool assignment and tool calling</li>
-            <li>RAG and semantic document retrieval</li>
-            <li>Embeddings and vector search using FAISS</li>
-            <li>FastAPI REST services</li>
-            <li>PostgreSQL persistence</li>
-            <li>Conversation memory and chat history</li>
-            <li>Multi-agent workflows</li>
-            <li>PDF, database, API, and time-series integrations</li>
+
+            <li>
+              Agent orchestration using Python, LangGraph,
+              and LangChain
+            </li>
+
+            <li>
+              Configurable agents with goals, prompts,
+              rules, and tool assignments
+            </li>
+
+            <li>
+              Dynamic agent-to-tool assignment and
+              tool invocation
+            </li>
+
+            <li>
+              Retrieval-Augmented Generation (RAG)
+            </li>
+
+            <li>
+              Semantic document search using embeddings
+              and FAISS
+            </li>
+
+            <li>
+              FastAPI-based REST services
+            </li>
+
+            <li>
+              PostgreSQL persistence for agents,
+              tools, conversations, and messages
+            </li>
+
+            <li>
+              Persistent conversation memory
+              and chat history
+            </li>
+
+            <li>
+              Multi-agent workflows for monitoring,
+              diagnostics, and knowledge retrieval
+            </li>
+
+            <li>
+              Extensible integrations for PDFs,
+              databases, time-series data, APIs,
+              and MCP tools
+            </li>
+
           </ul>
 
+
           <div class="tech-tags">
+
             <span>Python</span>
             <span>LangGraph</span>
             <span>LangChain</span>
@@ -176,90 +284,201 @@
             <span>PostgreSQL</span>
             <span>FAISS</span>
             <span>RAG</span>
+            <span>LLMs</span>
+
           </div>
 
+
           <div class="project-card__footer">
+
             <a
               class="text-link"
-              href="industrial%20agent%20framework/README.md"
+              href="https://github.com/kcsattiraju/kcsattiraju.github.io/tree/main/industrial%20agent%20framework"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Explore Project →
             </a>
+
           </div>
 
         </article>
 
 
-        <!-- PROJECT 2 -->
+        <!-- =================================================
+             PROJECT 2
+             AI TRAVEL PLANNING SYSTEM
+        ================================================== -->
+
         <article class="card project-card">
 
           <div class="project-card__header">
-            <span class="project-number">02</span>
-            <span class="project-type">Multi-Agent AI</span>
+
+            <span class="project-number">
+              02
+            </span>
+
+            <span class="project-type">
+              Multi-Agent AI
+            </span>
+
           </div>
 
-          <h3>AI Travel Planning System</h3>
+
+          <h3>
+            AI Travel Planning System
+          </h3>
+
 
           <p class="project-description">
+
             A multi-agent travel assistant that coordinates
-            specialized AI agents to plan flights, hotels,
-            and personalized travel itineraries through a
-            conversational interface.
+            specialized AI agents to help users plan flights,
+            hotels, and personalized travel itineraries through
+            a conversational interface.
+
           </p>
 
+
+          <p>
+
+            The application demonstrates how specialized AI agents
+            can collaborate within an orchestrated workflow while
+            maintaining state and conversation context.
+
+          </p>
+
+
           <ul class="project-features">
-            <li>Multi-agent workflow using LangGraph</li>
-            <li>Flight planning agent</li>
-            <li>Hotel planning agent</li>
-            <li>Itinerary generation agent</li>
-            <li>LLM-powered reasoning</li>
-            <li>Conversation memory</li>
-            <li>Workflow checkpoints</li>
-            <li>Interactive Streamlit interface</li>
+
+            <li>
+              Multi-agent workflow using LangGraph
+              and LangChain
+            </li>
+
+            <li>
+              Specialized flight planning agent
+            </li>
+
+            <li>
+              Specialized hotel planning agent
+            </li>
+
+            <li>
+              Intelligent itinerary generation
+            </li>
+
+            <li>
+              LLM-powered reasoning and orchestration
+            </li>
+
+            <li>
+              Conversation memory
+            </li>
+
+            <li>
+              Workflow checkpoints
+            </li>
+
+            <li>
+              Groq LLM integration
+            </li>
+
+            <li>
+              Interactive Streamlit interface
+            </li>
+
           </ul>
 
+
           <div class="tech-tags">
+
             <span>Python</span>
             <span>LangGraph</span>
             <span>LangChain</span>
             <span>Groq</span>
             <span>LLMs</span>
             <span>Streamlit</span>
+
           </div>
 
+
           <div class="project-card__footer">
+
             <a
               class="text-link"
-              href="ai-travel-project/README.md"
+              href="https://github.com/kcsattiraju/kcsattiraju.github.io/tree/main/ai-travel-project"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Explore Project →
             </a>
+
           </div>
 
         </article>
+
 
       </div>
 
     </section>
 
 
-    <!-- CURRENT INTERESTS -->
+    <!-- =====================================================
+         CURRENT ENGINEERING INTERESTS
+    ====================================================== -->
+
     <section class="section" id="interests">
 
-      <h2>Current Engineering Interests</h2>
+      <p class="eyebrow">
+        Focus Areas
+      </p>
+
+      <h2>
+        Current Engineering Interests
+      </h2>
+
 
       <div class="card">
 
         <ul class="interests-list">
-          <li>Agentic AI Architecture</li>
-          <li>Multi-Agent Systems</li>
-          <li>Retrieval-Augmented Generation (RAG)</li>
-          <li>Enterprise AI</li>
-          <li>Semantic Search & Vector Databases</li>
-          <li>AI Tool Calling</li>
-          <li>MCP Servers</li>
-          <li>AI-Enabled APIs & Microservices</li>
-          <li>Cloud-Native Architecture</li>
+
+          <li>
+            Agentic AI Architecture
+          </li>
+
+          <li>
+            Multi-Agent Systems
+          </li>
+
+          <li>
+            Retrieval-Augmented Generation (RAG)
+          </li>
+
+          <li>
+            Enterprise AI
+          </li>
+
+          <li>
+            Semantic Search & Vector Databases
+          </li>
+
+          <li>
+            AI Tool Calling
+          </li>
+
+          <li>
+            MCP Servers
+          </li>
+
+          <li>
+            AI-Enabled APIs & Microservices
+          </li>
+
+          <li>
+            Cloud-Native Architecture
+          </li>
+
         </ul>
 
       </div>
@@ -267,25 +486,38 @@
     </section>
 
 
-    <!-- CONTACT -->
+    <!-- =====================================================
+         CONTACT
+    ====================================================== -->
+
     <section class="section" id="contact">
 
-      <p class="eyebrow">Get In Touch</p>
+      <p class="eyebrow">
+        Get In Touch
+      </p>
 
-      <h2>Let's Connect</h2>
+      <h2>
+        Let's Connect
+      </h2>
+
 
       <p>
+
         I am interested in opportunities involving Senior Software
         Engineering, AI Engineering, Agentic AI, cloud platforms,
         enterprise applications, and intelligent software systems.
+
       </p>
 
+
       <p>
-        I enjoy building scalable software and exploring how
-        AI agents, retrieval, APIs, enterprise data, and cloud
-        technologies can work together to solve real-world
-        engineering problems.
+
+        I enjoy building scalable software and exploring how AI agents,
+        retrieval, APIs, enterprise data, and cloud technologies can
+        work together to solve real-world engineering problems.
+
       </p>
+
 
       <p>
         <strong>Dallas, Texas</strong>
@@ -296,10 +528,18 @@
   </main>
 
 
-  <!-- FOOTER -->
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
   <footer class="section footer">
-    <p>© 2026 Kranti Sattiraju</p>
+
+    <p>
+      © 2026 Kranti Sattiraju
+    </p>
+
   </footer>
+
 
 </body>
 </html>

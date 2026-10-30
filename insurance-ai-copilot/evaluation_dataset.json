@@ -1,0 +1,17 @@
+
+[
+  {
+    "question": "What is the collision deductible?",
+    "source": "sample_auto_policy.pdf",
+    "relevant_chunk_ids": [
+      "65e259d3046c1b24cd5c4dd02a2a87336fb8f8157de81155c32d71240b7925df"
+    ]
+  },
+  {
+    "question": "What does collision coverage include?",
+    "source": "sample_auto_policy.pdf",
+    "relevant_chunk_ids": [
+      "65e259d3046c1b24cd5c4dd02a2a87336fb8f8157de81155c32d71240b7925df"
+    ]
+  }
+]

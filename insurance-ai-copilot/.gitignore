@@ -1,0 +1,17 @@
+
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+.bedrock_agentcore/
+.bedrock_agentcore.yaml
+chroma_db/
+documents/
+backup*/
+*_backup.py
+*_before_*.py
+.publish-repo/
+.history_ui_check.py
